@@ -133,4 +133,7 @@ http {
 	include conf.d/*.conf;
 }
 `
+
+ADD my_ngx_conf /etc/nginx/conf.d
+
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
