@@ -220,7 +220,7 @@ test_now() {
 }
 
 get_port() {
-	startPort=${1:-8000}
+	startPort=${1:-80}
 	endPort=$((startPort + 100))
 
 	for p in $(seq ${startPort} ${endPort}); do

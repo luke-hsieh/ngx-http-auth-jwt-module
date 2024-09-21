@@ -631,6 +631,7 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
 {
   static const char *HEADER_PREFIX = "HEADER=";
   static const char *COOKIE_PREFIX = "COOKIE=";
+  static const char *QUERY_STRING_PREFIX = "QUERY=";
   char *jwtPtr = NULL;
 
   ngx_log_debug(NGX_LOG_DEBUG, r->connection->log, 0, "jwt_location.len %d", jwt_location.len);
@@ -671,22 +672,46 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
     jwt_location.data += strlen(COOKIE_PREFIX);
     jwt_location.len -= strlen(COOKIE_PREFIX);
 
-#ifndef NGX_LINKED_LIST_COOKIES
-    if (ngx_http_parse_multi_header_lines(&r->headers_in.cookies, &jwt_location, &jwtCookieVal) != NGX_DECLINED)
-    {
-      has_cookie = true;
-    }
-#else
-    if (ngx_http_parse_multi_header_lines(r, r->headers_in.cookie, &jwt_location, &jwtCookieVal) != NULL)
-    {
-      has_cookie = true;
-    }
-#endif
+    #ifndef NGX_LINKED_LIST_COOKIES
+      if (ngx_http_parse_multi_header_lines(&r->headers_in.cookies, &jwt_location, &jwtCookieVal) != NGX_DECLINED)
+      {
+        has_cookie = true;
+      }
+    #else
+      if (ngx_http_parse_multi_header_lines(r, r->headers_in.cookie, &jwt_location, &jwtCookieVal) != NULL)
+      {
+        has_cookie = true;
+      }
+    #endif
+      if (has_cookie == true)
+      {
+        jwtPtr = ngx_str_t_to_char_ptr(r->pool, jwtCookieVal);
+      }
+  }
+  else if (jwt_location.len > strlen(QUERY_STRING_PREFIX) && ngx_strncmp(jwt_location.data, QUERY_STRING_PREFIX, strlen(QUERY_STRING_PREFIX)) == 0) {
 
-    if (has_cookie == true)
+    jwt_location.data += strlen(QUERY_STRING_PREFIX);
+    jwt_location.len -= strlen(QUERY_STRING_PREFIX);
+
+    ngx_int_t jwt_location_hash = ngx_hash_key(jwt_location.data, jwt_location.len);
+    ngx_http_variable_value_t *query_string_var = ngx_http_get_variable(r, &jwt_location, jwt_location_hash);
+
+    ngx_str_t qstr;
+
+    ngx_log_debug(NGX_LOG_DEBUG, r->connection->log, 0, "jwt_location %s", jwt_location);
+    
+    if (query_string_var && !query_string_var->not_found && query_string_var->valid)
     {
-      jwtPtr = ngx_str_t_to_char_ptr(r->pool, jwtCookieVal);
+      // ideally we would like the URI with the querystring parameters
+      qstr.data = ngx_palloc(r->pool, query_string_var->len);
+      qstr.len = query_string_var->len;
+      ngx_memcpy(qstr.data, query_string_var->data, query_string_var->len);
+
+      ngx_log_debug(NGX_LOG_DEBUG, r->connection->log, 0, "qstr %s", qstr);
+
+      jwtPtr = ngx_str_t_to_char_ptr(r->pool, qstr);
     }
+
   }
 
   return jwtPtr;
