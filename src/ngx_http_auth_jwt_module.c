@@ -27,6 +27,7 @@ typedef struct
   ngx_str_t loginurl;
   ngx_str_t key;
   ngx_flag_t enabled;
+  ngx_flag_t jwt_required;
   ngx_flag_t redirect;
   ngx_str_t jwt_location;
   ngx_str_t algorithm;
@@ -76,6 +77,13 @@ static ngx_command_t auth_jwt_directives[] = {
      ngx_conf_set_flag_slot,
      NGX_HTTP_LOC_CONF_OFFSET,
      offsetof(auth_jwt_conf_t, enabled),
+     NULL},
+
+    {ngx_string("auth_jwt_token_required"),
+     NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF | NGX_CONF_FLAG,
+     ngx_conf_set_flag_slot,
+     NGX_HTTP_LOC_CONF_OFFSET,
+     offsetof(auth_jwt_conf_t, jwt_required),
      NULL},
 
     {ngx_string("auth_jwt_redirect"),
@@ -190,6 +198,7 @@ static void *create_conf(ngx_conf_t *cf)
   {
     // ngx_str_t fields are initialized by the ngx_palloc call above -- only need to init flags and arrays here
     conf->enabled = NGX_CONF_UNSET;
+    conf->jwt_required = NGX_CONF_UNSET;
     conf->redirect = NGX_CONF_UNSET;
     conf->validate_sub = NGX_CONF_UNSET;
     conf->redirect = NGX_CONF_UNSET;
@@ -219,6 +228,11 @@ static char *merge_conf(ngx_conf_t *cf, void *parent, void *child)
   if (conf->enabled == NGX_CONF_UNSET)
   {
     conf->enabled = prev->enabled == NGX_CONF_UNSET ? 0 : prev->enabled;
+  }
+
+  if (conf->jwt_required == NGX_CONF_UNSET)
+  {
+    conf->jwt_required = prev->jwt_required == NGX_CONF_UNSET ? 0 : prev->jwt_required;
   }
 
   if (conf->redirect == NGX_CONF_UNSET)
@@ -316,8 +330,12 @@ static ngx_int_t handle_request(ngx_http_request_t *r)
 
       if (jwtPtr == NULL)
       {
-        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "failed to find a JWT");
-        return redirect(r, jwtcf);
+        if ( jwtcf->jwt_required ) {
+          ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "failed to find a JWT");
+          return redirect(r, jwtcf);
+        } else {
+          return NGX_DECLINED;
+        } 
       }
       else
       {
