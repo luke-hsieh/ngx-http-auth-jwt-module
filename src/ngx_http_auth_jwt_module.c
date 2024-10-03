@@ -639,7 +639,7 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
   if (jwt_location.len > strlen(HEADER_PREFIX) && ngx_strncmp(jwt_location.data, HEADER_PREFIX, strlen(HEADER_PREFIX)) == 0)
   {
 
-    ngx_log_debug(NGX_LOG_DEBUG, r->connection->log, 0, ">>>>>>>> 111" );
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> 111" );
 
     ngx_table_elt_t *jwtHeaderVal;
 
@@ -670,7 +670,7 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
   else if (jwt_location.len > strlen(COOKIE_PREFIX) && ngx_strncmp(jwt_location.data, COOKIE_PREFIX, strlen(COOKIE_PREFIX)) == 0)
   {
 
-    ngx_log_debug(NGX_LOG_DEBUG, r->connection->log, 0, ">>>>>>>> 222" );
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> 222" );
 
     bool has_cookie = false;
     ngx_str_t jwtCookieVal;
@@ -696,7 +696,7 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
   }
   else if (jwt_location.len > strlen(QUERY_STRING_PREFIX) && ngx_strncmp(jwt_location.data, QUERY_STRING_PREFIX, strlen(QUERY_STRING_PREFIX)) == 0) {
 
-    ngx_log_debug(NGX_LOG_DEBUG, r->connection->log, 0, ">>>>>>>> 333" );
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> 333" );
 
     jwt_location.data += strlen(QUERY_STRING_PREFIX);
     jwt_location.len -= strlen(QUERY_STRING_PREFIX);
@@ -723,7 +723,7 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
     }
 
   } else {
-    ngx_log_debug(NGX_LOG_DEBUG, r->connection->log, 0, ">>>>>>>> 444" );
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> 444" );
   }
 
   return jwtPtr;
