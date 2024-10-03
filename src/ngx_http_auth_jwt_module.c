@@ -693,6 +693,8 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
     jwt_location.data += strlen(QUERY_STRING_PREFIX);
     jwt_location.len -= strlen(QUERY_STRING_PREFIX);
 
+    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "jwt_location %s", jwt_location);
+
     ngx_int_t jwt_location_hash = ngx_hash_key(jwt_location.data, jwt_location.len);
     ngx_http_variable_value_t *query_string_var = ngx_http_get_variable(r, &jwt_location, jwt_location_hash);
 

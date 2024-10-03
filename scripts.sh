@@ -75,6 +75,12 @@ build_module() {
 	fi
 }
 
+reinstall() {
+	stop_nginx()
+	rebuild_module()
+	start_nginx()
+}
+
 rebuild_module() {
 	clean_module
 	build_module --no-cache
