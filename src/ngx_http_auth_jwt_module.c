@@ -696,19 +696,19 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
   }
   else if (jwt_location.len > strlen(QUERY_STRING_PREFIX) && ngx_strncmp(jwt_location.data, QUERY_STRING_PREFIX, strlen(QUERY_STRING_PREFIX)) == 0) {
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> 333: %s", jwt_location );
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> 333" );
 
     jwt_location.data += strlen(QUERY_STRING_PREFIX);
     jwt_location.len -= strlen(QUERY_STRING_PREFIX);
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> jwt_location %s", jwt_location);
+    // ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> jwt_location %s", jwt_location);
 
     ngx_int_t jwt_location_hash = ngx_hash_key(jwt_location.data, jwt_location.len);
     ngx_http_variable_value_t *query_string_var = ngx_http_get_variable(r, &jwt_location, jwt_location_hash);
 
     ngx_str_t qstr;
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> jwt_location %s", jwt_location);
+    // ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> jwt_location %s", jwt_location);
     
     if (query_string_var && !query_string_var->not_found && query_string_var->valid)
     {
@@ -717,7 +717,7 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
       qstr.len = query_string_var->len;
       ngx_memcpy(qstr.data, query_string_var->data, query_string_var->len);
 
-      ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> qstr %s", qstr);
+      // ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> qstr %s", qstr);
 
       jwtPtr = ngx_str_t_to_char_ptr(r->pool, qstr);
     }
