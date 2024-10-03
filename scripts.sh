@@ -76,7 +76,7 @@ build_module() {
 }
 
 reinstall() {
-	stop_nginx
+	stop_nginx || true
 	rebuild_module
 	start_nginx
 }

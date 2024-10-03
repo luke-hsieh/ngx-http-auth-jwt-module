@@ -99,6 +99,8 @@ RUN adduser --system --no-create-home --shell /bin/false --group --disabled-logi
 RUN mkdir -p /var/cache/nginx /var/log/nginx
 WORKDIR /etc/nginx
 
+RUN mkdir /etc/nginx/logs
+
 FROM ngx_http_auth_jwt_builder_module AS ngx_http_auth_jwt_nginx
 LABEL maintainer="TeslaGov" email="developers@teslagov.com"
 ARG NGINX_VERSION
