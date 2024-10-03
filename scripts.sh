@@ -76,9 +76,9 @@ build_module() {
 }
 
 reinstall() {
-	stop_nginx()
-	rebuild_module()
-	start_nginx()
+	stop_nginx
+	rebuild_module
+	start_nginx
 }
 
 rebuild_module() {
