@@ -696,7 +696,7 @@ static char *get_jwt(ngx_http_request_t *r, ngx_str_t jwt_location)
   }
   else if (jwt_location.len > strlen(QUERY_STRING_PREFIX) && ngx_strncmp(jwt_location.data, QUERY_STRING_PREFIX, strlen(QUERY_STRING_PREFIX)) == 0) {
 
-    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> 333" );
+    ngx_log_debug(NGX_LOG_DEBUG_HTTP, r->connection->log, 0, ">>>>>>>> 333: %s", jwt_location );
 
     jwt_location.data += strlen(QUERY_STRING_PREFIX);
     jwt_location.len -= strlen(QUERY_STRING_PREFIX);
